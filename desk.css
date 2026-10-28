@@ -1,0 +1,349 @@
+@font-face {
+  font-family: Barlow;
+  font-style: normal;
+  font-weight: 400;
+  font-display: optional;
+  src: url("fonts/barlow-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: Barlow;
+  font-style: normal;
+  font-weight: 600;
+  font-display: optional;
+  src: url("fonts/barlow-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: Barlow;
+  font-style: normal;
+  font-weight: 700;
+  font-display: optional;
+  src: url("fonts/barlow-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Barlow Condensed";
+  font-style: normal;
+  font-weight: 700;
+  font-display: optional;
+  src: url("fonts/barlow-condensed-700.woff2") format("woff2");
+}
+
+:root {
+  --ink: #161616;
+  --paper: #ffffff;
+  --signal: #ffd100;
+  --line: #d9d9d4;
+  --muted: #3c433c;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Barlow, "Avenir Next", "Segoe UI", sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.4;
+}
+
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  background: var(--ink);
+  color: var(--signal);
+  padding: 0.45rem 0.7rem;
+}
+
+.skip:focus { top: 1rem; }
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(19rem, 0.85fr);
+  min-height: 100dvh;
+}
+
+.ledger {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100dvh;
+  padding: 1.4rem 1.8rem 1.2rem;
+}
+
+header.mast {
+  margin: -1.4rem -1.8rem 1.4rem;
+  padding: 1.6rem 1.8rem 1.45rem;
+  background: var(--ink);
+  color: var(--signal);
+}
+
+header h1 {
+  margin: 0;
+  max-width: 6.2ch;
+  font-family: "Barlow Condensed", Barlow, sans-serif;
+  font-size: clamp(4.8rem, 18vw, 6.4rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.84;
+}
+
+header p {
+  margin: 0.45rem 0 0;
+  color: var(--signal);
+}
+
+header .lede {
+  max-width: 28rem;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.list-heading {
+  margin: 1.5rem 0 0;
+  font-family: Barlow, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.filter {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.7rem;
+}
+
+.filter label { font-weight: 600; }
+
+input,
+button { font: inherit; color: inherit; }
+
+input {
+  width: 100%;
+  border: 0;
+  border-bottom: 2px solid var(--ink);
+  background: transparent;
+  border-radius: 0;
+  padding: 0.4rem 0 0.45rem;
+}
+
+#status {
+  min-height: 2.8em;
+  margin: 0.7rem 0 0.2rem;
+  color: var(--muted);
+}
+
+.list {
+  margin: 0.3rem 0 0;
+  padding: 0;
+  min-height: 52rem;
+  list-style: none;
+}
+
+.list li { margin: 0; padding: 0; }
+
+.flaw {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 0.9rem 0.7rem;
+  cursor: pointer;
+}
+
+.flaw-title {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.flaw-name,
+.meta { display: block; }
+
+.flaw-name {
+  min-width: 0;
+  margin-top: 0.12rem;
+  overflow: hidden;
+  color: var(--muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  margin-top: 0.15rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.flag { font-weight: 700; color: var(--ink); }
+
+.flaw:hover { background: #f3f3f0; }
+
+.flaw[aria-pressed="true"],
+.flaw[aria-pressed="true"]:hover {
+  background: var(--signal);
+}
+
+.flaw[aria-pressed="true"] .flaw-name,
+.flaw[aria-pressed="true"] .meta { color: var(--ink); }
+
+.side {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow: auto;
+  background: var(--signal);
+  padding: 1.5rem 1.5rem 2rem;
+}
+
+.back {
+  display: none;
+  margin: 0 0 1.1rem;
+  padding: 0 0 0.15rem;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.side > h2 {
+  margin: 0 0 0.7rem;
+  font-family: Barlow, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+#role-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.choice {
+  width: auto;
+  background: transparent;
+  border: 2px solid transparent;
+  padding: 0.35rem 0.5rem;
+  cursor: pointer;
+}
+
+.choice[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--signal);
+  border-color: var(--ink);
+}
+
+.action { margin-top: 1.6rem; }
+
+.for,
+.detail,
+.due { margin: 0; }
+
+.for {
+  font-weight: 600;
+  max-width: 28rem;
+}
+
+.action h2 {
+  margin: 0.45rem 0 0.9rem;
+  font-family: "Barlow Condensed", Barlow, sans-serif;
+  font-size: clamp(2.6rem, 4.6vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 0.92;
+  max-width: 11em;
+}
+
+.detail,
+.due {
+  max-width: 32rem;
+  font-size: 1.05rem;
+}
+
+.due { margin-top: 0.2rem; }
+
+.tools { margin: 0.9rem 0 0; }
+
+.action a {
+  color: var(--ink);
+  font-weight: 700;
+  text-underline-offset: 0.16em;
+}
+
+#copy-action {
+  display: inline-block;
+  margin-top: 1.1rem;
+  background: var(--ink);
+  color: var(--signal);
+  border: 0;
+  padding: 0.7rem 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+footer {
+  margin-top: auto;
+  padding-top: 2rem;
+  color: var(--muted);
+  font-size: 0.98rem;
+}
+
+footer p { margin: 0 0 0.45rem; max-width: 36rem; }
+
+footer ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+footer a {
+  color: var(--ink);
+  font-weight: 600;
+  text-underline-offset: 0.16em;
+}
+
+.fallback {
+  width: min(40rem, calc(100% - 2rem));
+  margin: 1rem auto;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+@media (max-width: 860px) {
+  .split { display: block; }
+  .ledger { min-height: 0; }
+  .side {
+    position: static;
+    height: auto;
+    min-height: 100dvh;
+  }
+  html[data-phone="yes"] .side,
+  body[data-view="list"] .side { display: none; }
+  body[data-view="action"] .side { display: block; }
+  body[data-view="action"] .ledger { display: none; }
+  .back { display: inline-block; }
+  .action h2 { font-size: clamp(2.5rem, 12vw, 3.6rem); }
+}
+
+@media print {
+  .skip, .filter, #copy-action, #role-group, .side > h2, .back { display: none; }
+  .split { display: block; }
+  .side { height: auto; position: static; }
+  .flaw:not([aria-pressed="true"]) { display: none; }
+}
