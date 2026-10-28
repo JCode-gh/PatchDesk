@@ -1,10 +1,10 @@
 (function () {
   var ROLES = [
-    { id: "owner", label: "I own the site", short: "Site owner", forWhom: "For the person who owns the site", tone: "down" },
-    { id: "operator", label: "I run the server", short: "Person who runs the server", forWhom: "For the person who runs the server", tone: "down" },
-    { id: "author", label: "I write the code", short: "Person who writes the code", forWhom: "For the person who writes the code", tone: "ask" },
-    { id: "host", label: "I host other people’s sites", short: "Host", forWhom: "For the host", tone: "down" },
-    { id: "visitor", label: "I only use the site", short: "Visitor", forWhom: "For someone who only uses the site", tone: "ask" }
+    { id: "owner", label: "I own the site", forWhom: "For the person who owns the site", tone: "down" },
+    { id: "operator", label: "I run the server", forWhom: "For the person who runs the server", tone: "down" },
+    { id: "author", label: "I write the code", forWhom: "For the person who writes the code", tone: "ask" },
+    { id: "host", label: "I host other people’s sites", forWhom: "For the host", tone: "down" },
+    { id: "visitor", label: "I only use the site", forWhom: "For someone who only uses the site", tone: "ask" }
   ];
   var DATE_LIMIT = 8;
   var CATALOG_URL = "https://cdn.jsdelivr.net/gh/cisagov/kev-data@develop/known_exploited_vulnerabilities.json";
@@ -125,17 +125,7 @@
     problem.className = "flaw-problem";
     problem.textContent = vuln.shortDescription || vuln.vulnerabilityName || "";
 
-    var actions = document.createElement("ul");
-    actions.className = "flaw-actions";
-    ROLES.forEach(function (role) {
-      var step = document.createElement("li");
-      var who = document.createElement("strong");
-      who.textContent = role.short + ". ";
-      step.append(who, document.createTextNode(feed.actionText(role.id, vuln)));
-      actions.appendChild(step);
-    });
-
-    button.append(title, meta, problem, actions);
+    button.append(title, meta, problem);
     return button;
   }
 
