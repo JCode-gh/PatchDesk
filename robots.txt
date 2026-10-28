@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://patchdesk.jcode.be/sitemap.xml
