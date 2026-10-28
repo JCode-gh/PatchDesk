@@ -7,8 +7,7 @@
     { id: "visitor", label: "I only use the site", forWhom: "For someone who only uses the site", tone: "ask" }
   ];
   var DATE_LIMIT = 8;
-  var COMMIT_URL = "https://api.github.com/repos/cisagov/kev-data/commits/develop";
-  var FILE_PATH = "/known_exploited_vulnerabilities.json";
+  var CATALOG_URL = "https://cdn.jsdelivr.net/gh/cisagov/kev-data@develop/known_exploited_vulnerabilities.json";
 
   var state = { role: "owner", query: "", selected: "", view: "list", openDate: null, vulns: [] };
   var narrow = window.matchMedia("(max-width: 860px)");
@@ -33,11 +32,6 @@
       if (ROLES[i].id === id) return ROLES[i];
     }
     return ROLES[0];
-  }
-
-  function catalogUrl(sha) {
-    var ref = sha || "develop";
-    return "https://cdn.jsdelivr.net/gh/cisagov/kev-data@" + ref + FILE_PATH;
   }
 
   function readUrl() {
@@ -273,18 +267,10 @@
       return Promise.resolve();
     }
     status.textContent = "Loading the catalog.";
-    return fetch(COMMIT_URL, { cache: "no-store" })
-      .then(function (res) { return res.ok ? res.json() : {}; })
-      .catch(function () { return {}; })
-      .then(function (commit) {
-        var url = catalogUrl(commit && commit.sha);
-        return fetch(url).then(function (res) {
-          if (res.ok) return res.json();
-          return fetch(catalogUrl("")).then(function (fallback) {
-            if (!fallback.ok) throw new Error(String(fallback.status));
-            return fallback.json();
-          });
-        });
+    return fetch(CATALOG_URL)
+      .then(function (res) {
+        if (!res.ok) throw new Error(String(res.status));
+        return res.json();
       })
       .then(applyCatalog)
       .catch(showError);
