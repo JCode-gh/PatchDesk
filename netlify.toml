@@ -1,2 +1,7 @@
 [build]
+  command = "node scripts/build-crawl.mjs"
   publish = "."
+
+[[edge_functions]]
+  function = "inject-crawl"
+  path = "/"

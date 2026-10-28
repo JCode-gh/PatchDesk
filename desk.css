@@ -211,6 +211,39 @@ input {
   white-space: normal;
 }
 
+.flaw-actions {
+  margin: 0.45rem 0 0;
+  padding-left: 1.15rem;
+  font-size: 0.98rem;
+}
+
+.flaw-actions li { margin: 0 0 0.25rem; }
+
+.day details { border-bottom: 1px solid var(--line); }
+
+.day summary {
+  padding: 0.9rem 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.day details[open] summary {
+  background: var(--ink);
+  color: var(--signal);
+}
+
+.day article h3 {
+  margin: 0;
+  font-family: Barlow, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.day article p,
+.day article ul { margin: 0.3rem 0 0; }
+
+.day article ul { padding-left: 1.15rem; }
+
 .flag { font-weight: 700; color: var(--ink); }
 
 .flaw:hover { background: #f3f3f0; }
