@@ -191,30 +191,24 @@ input {
 
 .flaw-title {
   min-width: 0;
-  overflow: hidden;
   font-size: 1.2rem;
   font-weight: 700;
   line-height: 1.2;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
-.flaw-name,
-.meta { display: block; }
+.flaw-cve,
+.flaw-problem { display: block; }
 
-.flaw-name {
-  min-width: 0;
-  margin-top: 0.12rem;
-  overflow: hidden;
-  color: var(--muted);
-  white-space: nowrap;
-  text-overflow: ellipsis;
+.flaw-cve {
+  margin-top: 0.2rem;
+  font-weight: 700;
 }
 
-.meta {
-  margin-top: 0.15rem;
-  color: var(--muted);
-  font-size: 0.95rem;
+.flaw-problem {
+  margin-top: 0.3rem;
+  color: var(--ink);
+  line-height: 1.35;
+  white-space: normal;
 }
 
 .flag { font-weight: 700; color: var(--ink); }
@@ -278,9 +272,17 @@ input {
 
 .action { margin-top: 1.6rem; }
 
-.for,
-.detail,
-.due { margin: 0; }
+.detail {
+  margin: 0.7rem 0 0;
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.problem {
+  margin: 0.4rem 0 0;
+  max-width: 36rem;
+  line-height: 1.4;
+}
 
 .for {
   font-weight: 600;
@@ -297,13 +299,11 @@ input {
   max-width: 11em;
 }
 
-.detail,
 .due {
   max-width: 32rem;
+  margin: 0.7rem 0 0;
   font-size: 1.05rem;
 }
-
-.due { margin-top: 0.2rem; }
 
 .tools { margin: 0.9rem 0 0; }
 

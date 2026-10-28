@@ -111,12 +111,8 @@
     title.className = "flaw-title";
     title.textContent = feed.productLabel(vuln);
 
-    var name = document.createElement("span");
-    name.className = "flaw-name";
-    name.textContent = vuln.vulnerabilityName || vuln.cveID;
-
     var meta = document.createElement("span");
-    meta.className = "meta";
+    meta.className = "flaw-cve";
     meta.textContent = vuln.cveID;
     if (vuln.knownRansomwareCampaignUse === "Known") {
       var flag = document.createElement("span");
@@ -125,7 +121,11 @@
       meta.append(document.createTextNode(", "), flag);
     }
 
-    button.append(title, name, meta);
+    var problem = document.createElement("span");
+    problem.className = "flaw-problem";
+    problem.textContent = vuln.shortDescription || vuln.vulnerabilityName || "";
+
+    button.append(title, meta, problem);
     return button;
   }
 
@@ -174,6 +174,8 @@
     var link = action.querySelector("[data-slot=link]");
     var due = action.querySelector("[data-slot=due]");
 
+    var problem = action.querySelector("[data-slot=problem]");
+
     if (!vuln) {
       action.dataset.tone = "ask";
       action.querySelector("[data-slot=for]").textContent = role.forWhom;
@@ -181,6 +183,7 @@
         ? "Nothing in the catalog matches that."
         : "The catalog has not loaded.";
       detail.hidden = true;
+      problem.hidden = true;
       link.hidden = true;
       due.hidden = true;
       copyButton.hidden = true;
@@ -189,11 +192,14 @@
 
     var sentence = feed.actionText(role.id, vuln);
     var url = feed.vendorUrl(vuln.notes);
+    var about = vuln.shortDescription || vuln.vulnerabilityName || "";
     action.dataset.tone = role.tone;
     action.querySelector("[data-slot=for]").textContent = role.forWhom;
     stamp.textContent = sentence;
     detail.hidden = false;
-    detail.textContent = vuln.cveID + ", added " + feed.formatDate(vuln.dateAdded) + ".";
+    detail.textContent = vuln.cveID;
+    problem.hidden = !about;
+    problem.textContent = about;
     if (url) {
       link.hidden = false;
       link.href = url;
