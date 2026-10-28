@@ -28,4 +28,14 @@ const vulns = [
 assert.deepStrictEqual(feed.visibleVulns(vulns, "", 2).map(function (v) { return v.cveID; }), ["CVE-3", "CVE-2"]);
 assert.deepStrictEqual(feed.visibleVulns(vulns, "php", 8).map(function (v) { return v.cveID; }), ["CVE-2"]);
 
+var sameDay = vulns.concat([
+  { cveID: "CVE-4", vendorProject: "Google", product: "Brotli", vulnerabilityName: "Other", dateAdded: "2026-10-27", shortDescription: "" }
+]);
+var grouped = feed.groupsByDate(sameDay, "", 2);
+assert.strictEqual(grouped.groups.length, 2);
+assert.strictEqual(grouped.groups[0].key, "2026-10-27");
+assert.deepStrictEqual(grouped.groups[0].items.map(function (v) { return v.cveID; }), ["CVE-3", "CVE-4"]);
+assert.strictEqual(grouped.groups[1].key, "2026-10-26");
+assert.strictEqual(feed.groupsByDate(sameDay, "php", 8).groups[0].key, "2026-10-26");
+
 console.log("feed checks passed");

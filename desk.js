@@ -6,12 +6,11 @@
     { id: "host", label: "I host other people’s sites", forWhom: "For the host", tone: "down" },
     { id: "visitor", label: "I only use the site", forWhom: "For someone who only uses the site", tone: "ask" }
   ];
-  var EMPTY_LIMIT = 8;
-  var SEARCH_LIMIT = 20;
+  var DATE_LIMIT = 8;
   var COMMIT_URL = "https://api.github.com/repos/cisagov/kev-data/commits/develop";
   var FILE_PATH = "/known_exploited_vulnerabilities.json";
 
-  var state = { role: "owner", query: "", selected: "", view: "list", vulns: [] };
+  var state = { role: "owner", query: "", selected: "", view: "list", openDate: null, vulns: [] };
   var narrow = window.matchMedia("(max-width: 860px)");
   var catalog = null;
 
@@ -76,9 +75,23 @@
     });
   }
 
-  function shown() {
-    var limit = state.query.trim() ? SEARCH_LIMIT : EMPTY_LIMIT;
-    return feed.visibleVulns(state.vulns, state.query, limit);
+  function shownGroups() {
+    return feed.groupsByDate(state.vulns, state.query, DATE_LIMIT);
+  }
+
+  function flatten(groups) {
+    var rows = [];
+    groups.forEach(function (group) {
+      group.items.forEach(function (vuln) { rows.push(vuln); });
+    });
+    return rows;
+  }
+
+  function ensureOpen(groups) {
+    var keys = groups.map(function (group) { return group.key; });
+    if (state.openDate === null || (state.openDate && keys.indexOf(state.openDate) === -1)) {
+      state.openDate = keys[0] || "";
+    }
   }
 
   function pickedVuln(rows) {
@@ -92,38 +105,71 @@
     return pickedVuln(rows) || rows[0] || null;
   }
 
-  function renderList(rows, current) {
+  function flawButton(vuln, pressed) {
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "flaw";
+    button.dataset.cve = vuln.cveID;
+    button.title = feed.productLabel(vuln) + ". " + (vuln.vulnerabilityName || vuln.cveID);
+    button.setAttribute("aria-pressed", pressed ? "true" : "false");
+
+    var title = document.createElement("span");
+    title.className = "flaw-title";
+    title.textContent = feed.productLabel(vuln);
+
+    var name = document.createElement("span");
+    name.className = "flaw-name";
+    name.textContent = vuln.vulnerabilityName || vuln.cveID;
+
+    var meta = document.createElement("span");
+    meta.className = "meta";
+    meta.textContent = vuln.cveID;
+    if (vuln.knownRansomwareCampaignUse === "Known") {
+      var flag = document.createElement("span");
+      flag.className = "flag";
+      flag.textContent = "Ransomware";
+      meta.append(document.createTextNode(", "), flag);
+    }
+
+    button.append(title, name, meta);
+    return button;
+  }
+
+  function renderList(groups, current) {
     list.replaceChildren();
-    rows.forEach(function (vuln) {
-      var button = document.createElement("button");
-      button.type = "button";
-      button.className = "flaw";
-      button.dataset.cve = vuln.cveID;
-      button.title = feed.productLabel(vuln) + ". " + (vuln.vulnerabilityName || vuln.cveID);
-      button.setAttribute("aria-pressed", current && vuln.cveID === current.cveID ? "true" : "false");
+    groups.forEach(function (group) {
+      var open = group.key === state.openDate;
+      var day = document.createElement("li");
+      day.className = "day";
 
-      var title = document.createElement("span");
-      title.className = "flaw-title";
-      title.textContent = feed.productLabel(vuln);
+      var toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "day-toggle";
+      toggle.dataset.date = group.key;
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      toggle.setAttribute("aria-controls", "day-" + group.key);
 
-      var name = document.createElement("span");
-      name.className = "flaw-name";
-      name.textContent = vuln.vulnerabilityName || vuln.cveID;
+      var when = document.createElement("span");
+      when.textContent = group.label;
+      var count = document.createElement("span");
+      count.className = "day-count";
+      count.textContent = group.items.length === 1 ? "1 flaw" : group.items.length + " flaws";
+      toggle.append(when, count);
 
-      var meta = document.createElement("span");
-      meta.className = "meta";
-      meta.textContent = [vuln.cveID, feed.formatDate(vuln.dateAdded)].filter(Boolean).join(", ");
-      if (vuln.knownRansomwareCampaignUse === "Known") {
-        var flag = document.createElement("span");
-        flag.className = "flag";
-        flag.textContent = "Ransomware";
-        meta.append(document.createTextNode(", "), flag);
+      var flaws = document.createElement("ul");
+      flaws.className = "day-flaws";
+      flaws.id = "day-" + group.key;
+      flaws.hidden = !open;
+      if (open) {
+        group.items.forEach(function (vuln) {
+          var item = document.createElement("li");
+          item.appendChild(flawButton(vuln, current && vuln.cveID === current.cveID));
+          flaws.appendChild(item);
+        });
       }
 
-      button.append(title, name, meta);
-      var item = document.createElement("li");
-      item.appendChild(button);
-      list.appendChild(item);
+      day.append(toggle, flaws);
+      list.appendChild(day);
     });
   }
 
@@ -175,24 +221,32 @@
 
   function render() {
     applyView();
-    var rows = shown();
+    var result = shownGroups();
+    var groups = result.groups;
+    ensureOpen(groups);
+    var rows = flatten(groups);
+    var openGroup = null;
+    for (var i = 0; i < groups.length; i++) {
+      if (groups[i].key === state.openDate) openGroup = groups[i];
+    }
+    var visibleRows = openGroup ? openGroup.items : [];
     var picked = pickedVuln(rows);
-    var current = (!isPhone() || state.view === "action") ? (picked || rows[0] || null) : picked;
+    var pickedVisible = picked && visibleRows.indexOf(picked) !== -1 ? picked : null;
+    var current = (!isPhone() || state.view === "action")
+      ? (pickedVisible || visibleRows[0] || null)
+      : pickedVisible;
     var total = state.vulns.length;
-    var matched = state.query.trim()
-      ? feed.visibleVulns(state.vulns, state.query, state.vulns.length).length
-      : total;
     if (!total) {
       status.textContent = "Loading the catalog.";
-    } else if (!rows.length) {
+    } else if (!groups.length) {
       status.textContent = "No match in " + total.toLocaleString("en") + " exploited flaws.";
     } else if (state.query.trim()) {
-      status.textContent = "Showing " + rows.length + " of " + matched + " matches.";
+      status.textContent = groups.length + (groups.length === 1 ? " date matches." : " dates match.");
     } else {
-      status.textContent = "Newest " + rows.length + " of " + total.toLocaleString("en") + " exploited flaws.";
+      status.textContent = "Newest " + groups.length + " dates. " + total.toLocaleString("en") + " exploited flaws in the catalog.";
     }
-    renderList(rows, current);
-    renderAction(signVuln(rows));
+    renderList(groups, current);
+    renderAction(picked || visibleRows[0] || rows[0] || null);
     renderRoles();
   }
 
@@ -245,6 +299,12 @@
   });
 
   list.addEventListener("click", function (event) {
+    var day = event.target.closest("button[data-date]");
+    if (day) {
+      state.openDate = state.openDate === day.dataset.date ? "" : day.dataset.date;
+      render();
+      return;
+    }
     var button = event.target.closest("button[data-cve]");
     if (!button) return;
     var opening = isPhone() && state.view !== "action";
@@ -284,7 +344,7 @@
   });
 
   copyButton.addEventListener("click", function () {
-    var vuln = signVuln(shown());
+    var vuln = signVuln(flatten(shownGroups().groups));
     if (!vuln) return;
     var text = [
       feed.actionText(state.role, vuln),

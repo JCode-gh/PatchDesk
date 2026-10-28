@@ -65,11 +65,33 @@
     return found.slice(0, limit);
   }
 
+  function groupsByDate(vulns, query, dateLimit) {
+    var needle = String(query || "").trim().toLowerCase();
+    var all = newestFirst(vulns).filter(function (vuln) { return matches(vuln, needle); });
+    var groups = [];
+    var seen = {};
+    all.forEach(function (vuln) {
+      var key = vuln.dateAdded || "";
+      if (!seen[key]) {
+        if (groups.length >= dateLimit) return;
+        seen[key] = {
+          key: key,
+          label: formatDate(key) || "Undated",
+          items: []
+        };
+        groups.push(seen[key]);
+      }
+      seen[key].items.push(vuln);
+    });
+    return { groups: groups, matchCount: all.length };
+  }
+
   return {
     productLabel: productLabel,
     formatDate: formatDate,
     vendorUrl: vendorUrl,
     actionText: actionText,
-    visibleVulns: visibleVulns
+    visibleVulns: visibleVulns,
+    groupsByDate: groupsByDate
   };
 });

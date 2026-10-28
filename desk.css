@@ -138,11 +138,44 @@ input {
 .list {
   margin: 0.3rem 0 0;
   padding: 0;
-  min-height: 52rem;
+  min-height: 24rem;
   list-style: none;
 }
 
 .list li { margin: 0; padding: 0; }
+
+.day-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.9rem 0.7rem;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.day-count {
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.day-toggle[aria-expanded="true"] {
+  background: var(--ink);
+  color: var(--signal);
+}
+
+.day-toggle[aria-expanded="true"] .day-count { color: var(--signal); }
+
+.day-flaws {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
 .flaw {
   display: grid;
